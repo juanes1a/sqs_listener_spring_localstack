@@ -17,6 +17,7 @@ Posterior debemos configurar el cliente aws, donde ejecutaremos:
 `aws configure`
 <br>
 LLenaremos los datos que se solicitan a continuación:
+<br>
 ![img.png](applications/app-service/src/main/resources/images/aws_configure.png)
 Importante: AWS Access Key ID y AWS Secret Access Key pueden ser cualquier valor
 
