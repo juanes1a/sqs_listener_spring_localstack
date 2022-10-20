@@ -7,14 +7,15 @@ ella, para esto debemos ejecutar el comando `docker-compose up -d` en una termin
 la raíz del directorio existe el archivo `docker-compose.yml`
 
 Al ejecutar el comando veremos algo como esto:
-![img.png](applications/app-service/src/main/resources/docker_compose_up.png)
+<br>
+![img.png](applications/app-service/src/main/resources/images/docker_compose_up.png)
 
 Posterior a levantar el comando vamos a ingresar a la imagen docker de localstack, para ello ejecutaremos:
 `docker exec -it localstack sh`
 
 Posterior debemos configurar el cliente aws, donde ejecutaremos:
 `aws configure`
-
+<br>
 LLenaremos los datos que se solicitan a continuación:
 ![img.png](applications/app-service/src/main/resources/images/aws_configure.png)
 Importante: AWS Access Key ID y AWS Secret Access Key pueden ser cualquier valor
@@ -39,4 +40,5 @@ Para enviar un mensaje a la cola de SQS ejecutaremos el siguiente comando:
 `aws --endpoint http://localhost:4566 sqs send-message --queue-url http://localhost:4566/000000000000/sample-queue --message-body test`
 
 Con el mensaje enviado y el listener activo por la consola de ejecución deberíamos ver:
+<br>
 ![img.png](applications/app-service/src/main/resources/images/message_listener_result.png)
