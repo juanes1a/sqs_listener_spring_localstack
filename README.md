@@ -19,6 +19,7 @@ Posterior debemos configurar el cliente aws, donde ejecutaremos:
 LLenaremos los datos que se solicitan a continuación:
 <br>
 ![img.png](applications/app-service/src/main/resources/images/aws_configure.png)
+<br>
 Importante: AWS Access Key ID y AWS Secret Access Key pueden ser cualquier valor
 
 Despues de esto ya nos podemos salir de la imagen docker, escribiendo `exit` en la consola
