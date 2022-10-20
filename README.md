@@ -1,47 +1,42 @@
-# Proyecto Base Implementando Clean Architecture
+# Proyecto Base Listener SQS y Localstack Implementando Clean Architecture
 
 ## Antes de Iniciar
 
-Empezaremos por explicar los diferentes componentes del proyectos y partiremos de los componentes externos, continuando con los componentes core de negocio (dominio) y por último el inicio y configuración de la aplicación.
+Lo primero que debemos hacer es levantar la imagen docker de localstack para poder crear la cola sqs y enviar mensajes a
+ella, para esto debemos ejecutar el comando `docker-compose up -d` en una terminal bash desde la raíz del directorio. En
+la raíz del directorio existe el archivo `docker-compose.yml`
 
-Lee el artículo [Clean Architecture — Aislando los detalles](https://medium.com/bancolombia-tech/clean-architecture-aislando-los-detalles-4f9530f35d7a)
+Al ejecutar el comando veremos algo como esto:
+![img.png](applications/app-service/src/main/resources/docker_compose_up.png)
 
-# Arquitectura
+Posterior a levantar el comando vamos a ingresar a la imagen docker de localstack, para ello ejecutaremos:
+`docker exec -it localstack sh`
 
-![Clean Architecture](https://miro.medium.com/max/1400/1*ZdlHz8B0-qu9Y-QO3AXR_w.png)
+Posterior debemos configurar el cliente aws, donde ejecutaremos:
+`aws configure`
 
-## Domain
+LLenaremos los datos que se solicitan a continuación:
+![img.png](applications/app-service/src/main/resources/images/aws_configure.png)
+Importante: AWS Access Key ID y AWS Secret Access Key pueden ser cualquier valor
 
-Es el módulo más interno de la arquitectura, pertenece a la capa del dominio y encapsula la lógica y reglas del negocio mediante modelos y entidades del dominio.
+Despues de esto ya nos podemos salir de la imagen docker, escribiendo `exit` en la consola
 
-## Usecases
+Luego de seguir los pasos anteriores debemos crear la cola SQS que vamos a escuchar, para ello en la consola ejecutaremos:
+<br>
+`aws --endpoint http://localhost:4566 sqs create-queue --queue-name sample-queue`
 
-Este módulo gradle perteneciente a la capa del dominio, implementa los casos de uso del sistema, define lógica de aplicación y reacciona a las invocaciones desde el módulo de entry points, orquestando los flujos hacia el módulo de entities.
+Esto nos creara la cola y nos dará la siguiente información: <br>
+`{ "QueueUrl": "http://localhost:4566/000000000000/sample-queue" }`
 
-## Infrastructure
+Esta url la debemos configurar en el `application.yaml` en el modulo de `application/app-service`
 
-### Helpers
+## Ejecutar Aplicativo
+Posterior a la configuración debemos ejecutar la aplicación por medio del IDE. Para probar el aplicativo enviaremos un 
+mensaje a la cola y imprimiremos este mensaje por consola
+<br>
+Para enviar un mensaje a la cola de SQS ejecutaremos el siguiente comando:
+<br>
+`aws --endpoint http://localhost:4566 sqs send-message --queue-url http://localhost:4566/000000000000/sample-queue --message-body test`
 
-En el apartado de helpers tendremos utilidades generales para los Driven Adapters y Entry Points.
-
-Estas utilidades no están arraigadas a objetos concretos, se realiza el uso de generics para modelar comportamientos
-genéricos de los diferentes objetos de persistencia que puedan existir, este tipo de implementaciones se realizan
-basadas en el patrón de diseño [Unit of Work y Repository](https://medium.com/@krzychukosobudzki/repository-design-pattern-bc490b256006)
-
-Estas clases no puede existir solas y debe heredarse su compartimiento en los **Driven Adapters**
-
-### Driven Adapters
-
-Los driven adapter representan implementaciones externas a nuestro sistema, como lo son conexiones a servicios rest,
-soap, bases de datos, lectura de archivos planos, y en concreto cualquier origen y fuente de datos con la que debamos
-interactuar.
-
-### Entry Points
-
-Los entry points representan los puntos de entrada de la aplicación o el inicio de los flujos de negocio.
-
-## Application
-
-Este módulo es el más externo de la arquitectura, es el encargado de ensamblar los distintos módulos, resolver las dependencias y crear los beans de los casos de use (UseCases) de forma automática, inyectando en éstos instancias concretas de las dependencias declaradas. Además inicia la aplicación (es el único módulo del proyecto donde encontraremos la función “public static void main(String[] args)”.
-
-**Los beans de los casos de uso se disponibilizan automaticamente gracias a un '@ComponentScan' ubicado en esta capa.**
+Con el mensaje enviado y el listener activo por la consola de ejecución deberíamos ver:
+![img.png](applications/app-service/src/main/resources/images/message_listener_result.png)
